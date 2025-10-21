@@ -1,0 +1,1 @@
+soma as nota ae
