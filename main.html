@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soma Total</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        body.dark-mode .container {
+            background: #1e1e1e;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            margin: 0;
+            padding: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .controls {
+            padding: 16px;
+            text-align: center;
+            background: #f5f5f5;
+            transition: background-color 0.4s ease;
+        }
+        body.dark-mode .controls {
+            background: #2a2a2a;
+        }
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+        #darkToggle {
+            background: #6c757d;
+        }
+        #darkToggle:hover {
+            background: #5a6268;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px 8px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        body.dark-mode th, body.dark-mode td {
+            border-color: #333;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        body.dark-mode th {
+            background: #2a2a2a;
+        }
+        input[type="number"] {
+            width: 50px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+            transform: scale(1.02);
+        }
+        body.dark-mode input[type="number"] {
+            background: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.8em;
+            transition: transform 0.2s ease;
+        }
+        .status:hover {
+            transform: scale(1.05);
+        }
+        .boa { background: #d4edda; color: #155724; }
+        .quase { background: #fff3cd; color: #856404; }
+        .ruim { background: #f8d7da; color: #721c24; }
+        body.dark-mode .boa { background: #2d5a3a; }
+        body.dark-mode .quase { background: #5a5204; }
+        body.dark-mode .ruim { background: #5a1e24; }
+        #totalRow {
+            font-weight: 600;
+            background: #f0f8ff !important;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        body.dark-mode #totalRow {
+            background: #1a1a2e !important;
+        }
+        .results {
+            padding: 24px;
+            margin-top: 0;
+            background: #f8f9fa;
+            animation: slideUp 0.5s ease-out;
+            transition: opacity 0.4s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        body.dark-mode .results {
+            background: #2a2a2a;
+        }
+        .graph-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        body.dark-mode .graph-section {
+            background: #2d2d2d;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-section h3 {
+            margin-bottom: 16px;
+            color: #4a90e2;
+            font-size: 1.2em;
+        }
+        #chartContainer {
+            height: 300px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #chartContainer.show {
+            opacity: 1;
+        }
+        #finalResult {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            animation: bounceIn 0.6s ease-out;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .passed { 
+            color: #28a745; 
+            background: #d4edda; 
+            padding: 8px 16px;
+        }
+        .failed { 
+            color: #dc3545; 
+            background: #f8d7da; 
+            padding: 8px 16px;
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            table { font-size: 11px; }
+            input[type="number"] { width: 40px; padding: 4px; }
+            th, td { padding: 6px 4px; }
+            h1 { font-size: 1.5em; padding: 16px; }
+            #chartContainer { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Soma Total</h1>
+        <div class="controls">
+            <button onclick="calcular()">Calcular</button>
+            <button id="darkToggle" onclick="toggleDarkMode()">🌙 Escuro</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Materia</th>
+                    <th>E1</th>
+                    <th>E2</th>
+                    <th>E3</th>
+                    <th>Total</th>
+                    <th>Média</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Artes</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalArtes">-</td><td id="mediaArtes">-</td><td id="statusArtes">-</td></tr>
+                <tr><td>Biologia</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalBiologia">-</td><td id="mediaBiologia">-</td><td id="statusBiologia">-</td></tr>
+                <tr><td>Ciência Conectada</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalCienciaConectada">-</td><td id="mediaCienciaConectada">-</td><td id="statusCienciaConectada">-</td></tr>
+                <tr><td>Educação Física</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalEducacaoFisica">-</td><td id="mediaEducacaoFisica">-</td><td id="statusEducacaoFisica">-</td></tr>
+                <tr><td>Estudos Avançados</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalEstudosAvancados">-</td><td id="mediaEstudosAvancados">-</td><td id="statusEstudosAvancados">-</td></tr>
+                <tr><td>Filosofia</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalFilosofia">-</td><td id="mediaFilosofia">-</td><td id="statusFilosofia">-</td></tr>
+                <tr><td>Física</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalFisica">-</td><td id="mediaFisica">-</td><td id="statusFisica">-</td></tr>
+                <tr><td>Geografia</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalGeografia">-</td><td id="mediaGeografia">-</td><td id="statusGeografia">-</td></tr>
+                <tr><td>História</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalHistoria">-</td><td id="mediaHistoria">-</td><td id="statusHistoria">-</td></tr>
+                <tr><td>Língua Inglesa</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalLinguagemInglesa">-</td><td id="mediaLinguagemInglesa">-</td><td id="statusLinguagemInglesa">-</td></tr>
+                <tr><td>Língua Portuguesa</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalLinguagemPortuguesa">-</td><td id="mediaLinguagemPortuguesa">-</td><td id="statusLinguagemPortuguesa">-</td></tr>
+                <tr><td>Linguagens</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalLinguagens">-</td><td id="mediaLinguagens">-</td><td id="statusLinguagens">-</td></tr>
+                <tr><td>Matemática</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalMatematica">-</td><td id="mediaMatematica">-</td><td id="statusMatematica">-</td></tr>
+                <tr><td>Problemas, Dados e Soluções</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalProblemas">-</td><td id="mediaProblemas">-</td><td id="statusProblemas">-</td></tr>
+                <tr><td>Projeto de Vida</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalProjetoVida">-</td><td id="mediaProjetoVida">-</td><td id="statusProjetoVida">-</td></tr>
+                <tr><td>Química</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalQuimica">-</td><td id="mediaQuimica">-</td><td id="statusQuimica">-</td></tr>
+                <tr><td>Razão e Sociedade</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalRazaoSociedade">-</td><td id="mediaRazaoSociedade">-</td><td id="statusRazaoSociedade">-</td></tr>
+                <tr><td>Sociologia</td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td><input type="number" min="0" max="10" step="0.1" onchange="calcular()"></td><td id="totalSociologia">-</td><td id="mediaSociologia">-</td><td id="statusSociologia">-</td></tr>
+                <tr id="totalRow">
+                    <td>Total Geral</td>
+                    <td id="totalEtapa1">-</td>
+                    <td id="totalEtapa2">-</td>
+                    <td id="totalEtapa3">-</td>
+                    <td id="totalGeral">-</td>
+                    <td id="mediaGeral">-</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="results" id="results" style="display: none;">
+            <div id="finalResult"></div>
+            <div class="graph-section">
+                <h3>Desempenho Geral por Etapa</h3>
+                <div id="chartContainer">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+
+        const materias = [
+            { nome: 'Artes', prefix: 'Artes' },
+            { nome: 'Biologia', prefix: 'Biologia' },
+            { nome: 'Ciência Conectada', prefix: 'CienciaConectada' },
+            { nome: 'Educação Física', prefix: 'EducacaoFisica' },
+            { nome: 'Estudos Avançados', prefix: 'EstudosAvancados' },
+            { nome: 'Filosofia', prefix: 'Filosofia' },
+            { nome: 'Física', prefix: 'Fisica' },
+            { nome: 'Geografia', prefix: 'Geografia' },
+            { nome: 'História', prefix: 'Historia' },
+            { nome: 'Língua Inglesa', prefix: 'LinguagemInglesa' },
+            { nome: 'Língua Portuguesa', prefix: 'LinguagemPortuguesa' },
+            { nome: 'Linguagens', prefix: 'Linguagens' },
+            { nome: 'Matemática', prefix: 'Matematica' },
+            { nome: 'Problemas, Dados e Soluções', prefix: 'Problemas' },
+            { nome: 'Projeto de Vida', prefix: 'ProjetoVida' },
+            { nome: 'Química', prefix: 'Quimica' },
+            { nome: 'Razão e Sociedade', prefix: 'RazaoSociedade' },
+            { nome: 'Sociologia', prefix: 'Sociologia' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            materias.forEach((mat, index) => {
+                for (let e = 1; e <= 3; e++) {
+                    const row = document.querySelectorAll('tbody tr')[index];
+                    const cell = row.querySelectorAll('td')[e];
+                    const input = cell.querySelector('input');
+                    input.id = `${mat.prefix}Etapa${e}`;
+                }
+            });
+        });
+
+        function calcular() {
+            let somaEtapa1 = 0, somaEtapa2 = 0, somaEtapa3 = 0;
+            let totalGeral = 0;
+            let medias = [];
+            let statuses = [];
+
+            materias.forEach(mat => {
+                const n1 = parseFloat(document.getElementById(`${mat.prefix}Etapa1`).value) || 0;
+                const n2 = parseFloat(document.getElementById(`${mat.prefix}Etapa2`).value) || 0;
+                const n3 = parseFloat(document.getElementById(`${mat.prefix}Etapa3`).value) || 0;
+
+                const totalMat = n1 + n2 + n3;
+                const mediaMat = totalMat / 3;
+
+                document.getElementById(`total${mat.prefix}`).textContent = totalMat.toFixed(1);
+                document.getElementById(`media${mat.prefix}`).textContent = mediaMat.toFixed(1);
+
+                let statusClass = '', statusText = '';
+                if (mediaMat >= 6) {
+                    statusClass = 'boa';
+                    statusText = '🟩 Boa';
+                } else if (mediaMat >= 4) {
+                    statusClass = 'quase';
+                    statusText = '🟨 Quase boa';
+                } else {
+                    statusClass = 'ruim';
+                    statusText = '🟥 Ruim';
+                }
+                document.getElementById(`status${mat.prefix}`).innerHTML = `<span class="status ${statusClass}">${statusText}</span>`;
+
+                somaEtapa1 += n1;
+                somaEtapa2 += n2;
+                somaEtapa3 += n3;
+                totalGeral += totalMat;
+                medias.push(mediaMat);
+                statuses.push({mat: mat.nome, status: statusClass});
+            });
+
+            document.getElementById('totalEtapa1').textContent = somaEtapa1.toFixed(1);
+            document.getElementById('totalEtapa2').textContent = somaEtapa2.toFixed(1);
+            document.getElementById('totalEtapa3').textContent = somaEtapa3.toFixed(1);
+            document.getElementById('totalGeral').textContent = totalGeral.toFixed(1);
+            const mediaGeral = totalGeral / (materias.length * 3);
+            document.getElementById('mediaGeral').textContent = mediaGeral.toFixed(1);
+
+            // Mostrar resultados com animação
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            setTimeout(() => resultsDiv.style.opacity = '1', 10);
+
+            // Resultado final
+            const passou = totalGeral >= 18 && medias.every(m => m >= 6);
+            const finalResult = document.getElementById('finalResult');
+            if (passou) {
+                finalResult.innerHTML = '<span class="passed">🎉 Parabéns! Você passou!</span>';
+            } else {
+                finalResult.innerHTML = '<span class="failed">😔 Infelizmente, você não passou.</span>';
+            }
+
+            // Gráfico na seção dedicada
+            const chartContainer = document.getElementById('chartContainer');
+            chartContainer.classList.add('show');
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Etapa 1', 'Etapa 2', 'Etapa 3'],
+                    datasets: [{
+                        data: [somaEtapa1 / materias.length, somaEtapa2 / materias.length, somaEtapa3 / materias.length],
+                        backgroundColor: ['#4a90e2', '#7ed321', '#f5a623'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: { 
+                        animateRotate: true,
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.getElementById('darkToggle');
+            btn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Claro' : '🌙 Escuro';
+        }
+    </script>
+</body>
+</html>
